@@ -1,9 +1,23 @@
 void main() {
-    int y = 5;
-	int z = 3;
-	int x = 1;
-	int a = 12;
-	byte ba = 8b;
-	byte bb = 9b;
-	byte bc = 12b;
+    int y = (1 + (1 + 1));
+}
+
+int foo(int arg0, int arg1)
+{
+	int x = arg0 + arg1;
+	x = arg0 - arg1;
+	int y = arg1 * arg0;
+
+	int z = x / arg1;
+
+	byte b1 = 100b;
+	byte b2 = 200b;
+
+	byte b3 = b1 * b2;
+
+	bool abc = true;
+	bool bca = false;
+	bool res = abc or bca;
+
+	return 1;
 }

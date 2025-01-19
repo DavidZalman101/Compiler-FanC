@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "visitor.hpp"
 
 namespace ast {
@@ -129,7 +130,7 @@ namespace ast {
     public:
         // Name of the identifier
         std::string value;
-		unsigned int offset;
+		int offset;
 
         // Constructor that receives a C-style string that represents the identifier
         explicit ID(const char *str);
@@ -463,8 +464,9 @@ namespace ast {
         std::shared_ptr<Formals> formals;
         // Body of the function
         std::shared_ptr<Statements> body;
+		std::unordered_map<std::string, int> symbol_table;
 
-		unsigned int max_offset;
+		int max_offset;
 
         // Constructor that receives the identifier, the return type, the list of formal parameters, and the body
         FuncDecl(std::shared_ptr<ID> id, std::shared_ptr<Type> return_type, std::shared_ptr<Formals> formals,

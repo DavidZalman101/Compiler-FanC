@@ -25,6 +25,8 @@ namespace Ir{
 	
     public:
 		
+		std::unordered_map<std::string,int> m_var_offset;
+		
     	output::CodeBuffer codebuffer;
 
 		IrVisitor();

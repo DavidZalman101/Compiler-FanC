@@ -69,6 +69,7 @@ namespace semantic {
 		std::stack<var> symbols_stack; // {id, offset}
 		std::unordered_map<std::string, ast::BuiltInType> symbols_map; // id -> type
 		std::stack<int> next_offset_stack;
+		std::unordered_map<std::string, int> global_symbol_table;
 
 		// declared functions validity
 		std::unordered_map<std::string, func> funcs_map; // string(func_name) -> {id, type, formals}
@@ -81,7 +82,7 @@ namespace semantic {
 
 		int in_while_loop;
 
-		unsigned int max_curr_offset;
+		int max_curr_offset;
 
 		void openSymbolFrame();
 
