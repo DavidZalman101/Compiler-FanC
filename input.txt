@@ -1,0 +1,29 @@
+void main() {
+    int x;
+    byte y = 10b;
+    x = y;   // Valid: Implicit conversion from byte to int
+	int z;
+
+	if (true) {
+
+		int w;
+	}
+
+	int s = 0;
+}
+
+int foo(int x, int y, bool z, byte q) {
+	// blast!
+	int b = 1;
+	int a = 1;
+	int c = 1;
+	int d = 1;
+	int e = 1;
+	int f = 1;
+	x = 1;
+}
+
+int bar(bool x) {
+	// damn!
+	x = true;
+}

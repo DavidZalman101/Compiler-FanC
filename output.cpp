@@ -131,4 +131,51 @@ namespace output {
         os << buffer.globalsBuffer.str() << std::endl << buffer.buffer.str();
         return os;
     }
+
+    /* ScopePrinter class */
+
+    ScopePrinter::ScopePrinter() : indentLevel(0) {}
+
+    std::string ScopePrinter::indent() const {
+        std::string result;
+        for (int i = 0; i < indentLevel; ++i) {
+            result += "  ";
+        }
+        return result;
+    }
+
+    void ScopePrinter::beginScope() {
+        indentLevel++;
+        buffer << indent() << "---begin scope---" << std::endl;
+    }
+
+    void ScopePrinter::endScope() {
+        buffer << indent() << "---end scope---" << std::endl;
+        indentLevel--;
+    }
+
+    void ScopePrinter::emitVar(const std::string &id, const ast::BuiltInType &type, int offset) {
+        buffer << indent() << id << " " << toString(type) << " " << offset << std::endl;
+    }
+
+    void ScopePrinter::emitFunc(const std::string &id, const ast::BuiltInType &returnType,
+                                const std::vector<ast::BuiltInType> &paramTypes) {
+        globalsBuffer << id << " " << "(";
+
+        for (int i = 0; i < paramTypes.size(); ++i) {
+            globalsBuffer << toString(paramTypes[i]);
+            if (i != paramTypes.size() - 1)
+                globalsBuffer << ",";
+        }
+
+        globalsBuffer << ")" << " -> " << toString(returnType) << std::endl;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const ScopePrinter &printer) {
+        os << "---begin global scope---" << std::endl;
+        os << printer.globalsBuffer.str();
+        os << printer.buffer.str();
+        os << "---end global scope---" << std::endl;
+        return os;
+    }
 }
