@@ -27,16 +27,6 @@ namespace Ir{
 
 	}
 
-	//void IrVisitor::allocate_arguments_on_stack(ast::Formals &node) {
-	//	// %ptr = alloca i32
-	//	codebuffer.emit("allocate_local_arguments:");
-
-	//	for (auto it = node.formals.begin(); it != node.formals.end(); ++it) {
-	//		std::string ptr_name = "stack_ptr_" + (*it)->id->value;
-	//		codebuffer.emit("\t" + ptr_name + " = alloca i32");
-	//	}
-	//}
-
 	// VISIT methods
 
 	IrVisitor::IrVisitor() {
@@ -59,9 +49,17 @@ namespace Ir{
 	}
 
     void IrVisitor::visit(ast::Num &node) {
+		/* %var = add i32 0, <value>*/
+		std::string reg = codebuffer.freshVar();
+		node.reg_name = reg;
+		codebuffer.emit("\t" + reg + " = add i32 0, " + std::to_string(node.value));
     }
 
     void IrVisitor::visit(ast::NumB &node) {
+		/* %var = add i32 0, <value>*/
+		std::string reg = codebuffer.freshVar();
+		node.reg_name = reg;
+		codebuffer.emit("\t" + reg + " = add i32 0, " + std::to_string(node.value));
     }
 
     void IrVisitor::visit(ast::String &node) {
@@ -101,6 +99,8 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::Statements &node) {
+		for (auto it = node.statements.begin(); it != node.statements.end(); ++it)
+			(*it)->accept(*this);
 	}
 
     void IrVisitor::visit(ast::Break &node) {
@@ -119,6 +119,16 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::VarDecl &node) {
+		/* store i32 <default/reg>, i32* %t<offset>_stack_ptr */
+
+		std::string var_address = "%t" + std::to_string(node.id->offset) + "_stack_ptr";
+
+		// TODO: generate different code for different types -> taking care of BOOL
+		if (node.init_exp) {
+			node.init_exp->accept(*this);
+			codebuffer.emit("\tstore i32 " + node.init_exp->reg_name + ", i32* " + var_address);
+		} else
+			codebuffer.emit("\tstore i32 0, i32* " + var_address);
     }
 
     void IrVisitor::visit(ast::Assign &node) {
@@ -148,9 +158,22 @@ namespace Ir{
 		codebuffer.emit("\t%stack_base_size = add i32 " + std::to_string(node.max_offset + 1) + ", 0");
 		codebuffer.emit("\t%ptr_stack_base = alloca i32, i32 %stack_base_size");
 		codebuffer.emit("\tstore i32 0, i32* %ptr_stack_base");
-		//allocate_arguments_on_stack(*node.formals);
+		codebuffer.emit("");
+
+		// create a pointer reg for each element - format: %t<offset>_stack_ptr
+		for (int i = 0; i < node.max_offset + 1; i++)
+			codebuffer.emit("\t%t" + std::to_string(i) + "_stack_ptr = getelementptr i32," + 
+							"i32* %ptr_stack_base, i32 " + std::to_string(i));
+
+		codebuffer.emit("");
+
+		// TODO: visit the formals
+
+		// TODO: visit the body
+		node.body->accept(*this);
 
 		// TODO: return dynamically
+		codebuffer.emit("");
 		codebuffer.emit("\tret i32 0");
 		codebuffer.emit("}\n");
 		//}

@@ -31,27 +31,33 @@ define void @print(i8*) {
 define i32 @main()
 {
 init_local_vars:
-	%stack_base_size = add i32 4, 0
+	%stack_base_size = add i32 7, 0
 	%ptr_stack_base = alloca i32, i32 %stack_base_size
 	store i32 0, i32* %ptr_stack_base
-	ret i32 0
-}
 
-define i32 @foo(i32, i32, i1, i8)
-{
-init_local_vars:
-	%stack_base_size = add i32 6, 0
-	%ptr_stack_base = alloca i32, i32 %stack_base_size
-	store i32 0, i32* %ptr_stack_base
-	ret i32 0
-}
+	%t0_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 0
+	%t1_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 1
+	%t2_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 2
+	%t3_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 3
+	%t4_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 4
+	%t5_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 5
+	%t6_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 6
 
-define i32 @bar(i1)
-{
-init_local_vars:
-	%stack_base_size = add i32 1, 0
-	%ptr_stack_base = alloca i32, i32 %stack_base_size
-	store i32 0, i32* %ptr_stack_base
+	%t0 = add i32 0, 5
+	store i32 %t0, i32* %t0_stack_ptr
+	%t1 = add i32 0, 3
+	store i32 %t1, i32* %t1_stack_ptr
+	%t2 = add i32 0, 1
+	store i32 %t2, i32* %t2_stack_ptr
+	%t3 = add i32 0, 12
+	store i32 %t3, i32* %t3_stack_ptr
+	%t4 = add i32 0, 8
+	store i32 %t4, i32* %t4_stack_ptr
+	%t5 = add i32 0, 9
+	store i32 %t5, i32* %t5_stack_ptr
+	%t6 = add i32 0, 12
+	store i32 %t6, i32* %t6_stack_ptr
+
 	ret i32 0
 }
 

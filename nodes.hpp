@@ -55,6 +55,7 @@ namespace ast {
     public:
 		std::string exp_name; // helps capture miss use of func id as var
 		BuiltInType exp_type;
+		std::string reg_name; // helps knowing what reg holds its value
         Exp() = default;
 		Exp(BuiltInType exp_type);
     };
