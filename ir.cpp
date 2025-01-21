@@ -169,38 +169,54 @@ namespace Ir{
     void IrVisitor::visit(ast::RelOp &node) {
 		// TODO: complete
 
-		//node.left->accept(*this);
-		//node.right->accept(*this);
+		node.left->accept(*this);
+		node.right->accept(*this);
 
-		//switch() {
+		std::string left_exp_reg = node.left->reg_name;
+		std::string right_exp_reg = node.right->reg_name;
+		node.reg_name = codebuffer.freshVar();
 
-		//	// ==
-		//	case(EQ):
-		//	break;
+		switch(node.op) {
 
-		//	// !=
-		//	case(NE):
-		//	break;
+			// ==
+			case(ast::EQ):
+				codebuffer.emit("\t" + node.reg_name + " = icmp eq i32 " + left_exp_reg + ", " + right_exp_reg);
+			break;
 
-		//	// <
-		//	case(LT):
-		//	break;
+			// !=
+			case(ast::NE):
+				codebuffer.emit("\t" + node.reg_name + " = icmp ne i32 " + left_exp_reg + ", " + right_exp_reg);
+			break;
 
-		//	// >
-		//	case(GT):
-		//	break;
+			// <
+			case(ast::LT):
+				codebuffer.emit("\t" + node.reg_name + " = icmp slt i32 " + left_exp_reg + ", " + right_exp_reg);
+			break;
 
-		//	// <=
-		//	case(LE):
-		//	break;
+			// >
+			case(ast::GT):
+				codebuffer.emit("\t" + node.reg_name + " = icmp sgt i32 " + left_exp_reg + ", " + right_exp_reg);
+			break;
 
-		//	// >=
-		//	case(GE):
-		//	break;
+			// <=
+			case(ast::LE):
+				codebuffer.emit("\t" + node.reg_name + " = icmp sle i32 " + left_exp_reg + ", " + right_exp_reg);
+			break;
+			break;
 
-		//	default:
-		//	break;
-		//}
+			// >=
+			case(ast::GE):
+				codebuffer.emit("\t" + node.reg_name + " = icmp sge i32 " + left_exp_reg + ", " + right_exp_reg);
+			break;
+
+			default:
+			break;
+		}
+
+		// node.reg is i1, convert it to i32
+		std::string extended_reg = codebuffer.freshVar();
+		codebuffer.emit("\t" + extended_reg + " = zext i1 " + node.reg_name + " to i32");
+		node.reg_name = extended_reg;
     }
 
     void IrVisitor::visit(ast::Type &node) {

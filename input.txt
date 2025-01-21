@@ -1,7 +1,6 @@
 void main() {
-	int x;
-	int z;
-	int w;
+	int x = 3;
+	int y = 4;
+	bool res = (x == y);
 
-	int res = z / w;
 }
