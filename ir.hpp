@@ -27,6 +27,8 @@ namespace Ir{
 		
 		std::string error_div_by_zero;
     	output::CodeBuffer codebuffer;
+		std::stack<std::string> while_exit_labels;
+		std::stack<std::string> while_cond_labels;
 
 		IrVisitor();
 

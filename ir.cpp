@@ -299,9 +299,11 @@ namespace Ir{
 	}
 
     void IrVisitor::visit(ast::Break &node) {
+		codebuffer.emit("\tbr label " + while_exit_labels.top());
     }
 
     void IrVisitor::visit(ast::Continue &node) {
+		codebuffer.emit("\tbr label " + while_cond_labels.top());
     }
 
     void IrVisitor::visit(ast::Return &node) {
@@ -348,6 +350,9 @@ namespace Ir{
 		std::string loop_entrie = codebuffer.freshLabel();
 		std::string done = codebuffer.freshLabel();
 
+		while_exit_labels.push(done);
+		while_cond_labels.push(cond_entrie);
+
 		codebuffer.emit("\tbr label " + cond_entrie);
 		codebuffer.emitLabel(cond_entrie);
 		node.condition->accept(*this);
@@ -359,6 +364,8 @@ namespace Ir{
 		codebuffer.emit("\tbr label " + cond_entrie);
 
 		codebuffer.emitLabel(done);
+		while_exit_labels.pop();
+		while_cond_labels.pop();
     }
 
     void IrVisitor::visit(ast::VarDecl &node) {

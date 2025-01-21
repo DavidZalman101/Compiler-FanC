@@ -50,11 +50,18 @@ label_0:
 	%t2 = icmp eq i32 %t6, 1
 	br i1 %t2, label %label_1, label %label_2
 label_1:
-	
 	%t7 = load i32, i32* %t0_stack_ptr
+	call void @printi(i32 %t7)
 	%t8 = add i32 0, 1
 	%t9 = sub i32 %t7, %t8
 	store i32 %t9, i32* %t0_stack_ptr
+
+	br label %label_0
+
+	%t11 = load i32, i32* %t0_stack_ptr
+	%t12 = add i32 0, 1
+	%t13 = sub i32 %t11, %t12
+	store i32 %t13, i32* %t0_stack_ptr
 
 	br label %label_0
 label_2:
