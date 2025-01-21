@@ -84,6 +84,8 @@ namespace semantic {
 
 		int max_curr_offset;
 
+		ast::BuiltInType func_return_type;
+
 		void openSymbolFrame();
 
 		void closeSymbolFrame(bool func_frame, int line);

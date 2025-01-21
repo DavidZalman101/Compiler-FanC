@@ -167,7 +167,6 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::RelOp &node) {
-		// TODO: complete
 
 		node.left->accept(*this);
 		node.right->accept(*this);
@@ -233,22 +232,57 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::And &node) {
-			
-			node.left->accept(*this);
-			node.right->accept(*this);
 
-			node.reg_name = codebuffer.freshVar();
-			codebuffer.emit("\t" + node.reg_name + " = and i32 " + node.left->reg_name + ", " + node.right->reg_name);
+		node.reg_name = codebuffer.freshVar();
+		std::string ptr = codebuffer.freshVar();
+		std::string cmp = codebuffer.freshVar();
+
+		std::string check = codebuffer.freshLabel();
+		std::string done = codebuffer.freshLabel();
+
+		codebuffer.emit("\t" + ptr + " = alloca i32, i32 1");
+		codebuffer.emit("\tstore i32 0, i32* " + ptr);
+		node.left->accept(*this);
+		codebuffer.emit("\t" + cmp + " = icmp eq i32 " + node.left->reg_name + ", 0");
+		codebuffer.emit("\tbr i1 " + cmp + ", label " + done + ", label " + check);
+
+		codebuffer.emitLabel(check);
+		node.right->accept(*this);
+		codebuffer.emit("\tstore i32 " + node.right->reg_name + ", i32* " + ptr);
+		codebuffer.emit("\t br label " + done);
+
+		codebuffer.emitLabel(done);
+		codebuffer.emit("\t" + node.reg_name + " = load i32, i32* " + ptr);
     }
 
     void IrVisitor::visit(ast::Or &node) {
 
-			node.left->accept(*this);
-			node.right->accept(*this);
+		node.reg_name = codebuffer.freshVar();
+		std::string ptr = codebuffer.freshVar();
+		std::string cmp = codebuffer.freshVar();
+		std::string cmp2 = codebuffer.freshVar();
 
-			node.reg_name = codebuffer.freshVar();
-			codebuffer.emit("\t" + node.reg_name + " = or i32 " + node.left->reg_name + ", " + node.right->reg_name);
+		std::string label1 = codebuffer.freshLabel();
+		std::string label2 = codebuffer.freshLabel();
+		std::string done = codebuffer.freshLabel();
 
+		codebuffer.emit("\t" + ptr + " = alloca i32, i32 1");
+		codebuffer.emit("\tstore i32 0, i32* " + ptr);
+		node.left->accept(*this);
+		codebuffer.emit("\t" + cmp + " = icmp eq i32 " + node.left->reg_name + ", 1");
+		codebuffer.emit("\tbr i1 " + cmp + ", label " + label1 + ", label " + label2);
+
+		codebuffer.emitLabel(label1);
+		codebuffer.emit("\tstore i32 1, i32* " + ptr);
+		codebuffer.emit("\tbr label " + done);
+
+		codebuffer.emitLabel(label2);
+		node.right->accept(*this);
+		codebuffer.emit("\tstore i32 " + node.right->reg_name + ", i32* " + ptr);
+		codebuffer.emit("\tbr label " + done);
+
+		codebuffer.emitLabel(done);
+		codebuffer.emit("\t" + node.reg_name + " = load i32, i32* " + ptr);
     }
 
     void IrVisitor::visit(ast::ExpList &node) {
@@ -271,6 +305,13 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::Return &node) {
+
+		if (!node.exp)
+			codebuffer.emit("\tret void");
+		else {
+			node.exp->accept(*this);
+			codebuffer.emit("\tret i32 " + node.exp->reg_name);
+		}
     }
 
     void IrVisitor::visit(ast::If &node) {
@@ -346,10 +387,6 @@ namespace Ir{
 
 		// TODO: visit the body
 		node.body->accept(*this);
-
-		// TODO: return dynamically
-		codebuffer.emit("");
-		codebuffer.emit("\tret i32 0");
 		codebuffer.emit("}\n");
 		//}
     }
