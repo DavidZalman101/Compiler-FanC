@@ -1,8 +1,9 @@
 void main() {
-	bool a = false;
-	bool b = true;
 
-	bool res = (a and b) or (a or b);
+	int x = 3;
+	while (x >= 0) {
+		x = x - 1;
+	}
 
 	return;
 }

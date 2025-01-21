@@ -316,10 +316,49 @@ namespace Ir{
 
     void IrVisitor::visit(ast::If &node) {
 
+		std::string cmp = codebuffer.freshLabel();
+
+		std::string if_body = codebuffer.freshLabel();
+		std::string else_body = codebuffer.freshLabel();
+		std::string done = codebuffer.freshLabel();
+
+		node.condition->accept(*this);
+
+		codebuffer.emit("\t" + cmp + " = icmp eq i32 " + node.condition->reg_name + ", 1");
+		codebuffer.emit("\tbr i1 " + cmp + ", label " + if_body + ", label " + else_body);
+
+		codebuffer.emitLabel(if_body);
 		node.then->accept(*this);
+		codebuffer.emit("\tbr label " + done);
+
+		codebuffer.emitLabel(else_body);
+		if (node.otherwise)
+			node.otherwise->accept(*this);
+		codebuffer.emit("\tbr label " + done);
+
+		codebuffer.emitLabel(done);
+
     }
 
     void IrVisitor::visit(ast::While &node) {
+
+		std::string cmp = codebuffer.freshVar();
+
+		std::string cond_entrie = codebuffer.freshLabel();
+		std::string loop_entrie = codebuffer.freshLabel();
+		std::string done = codebuffer.freshLabel();
+
+		codebuffer.emit("\tbr label " + cond_entrie);
+		codebuffer.emitLabel(cond_entrie);
+		node.condition->accept(*this);
+		codebuffer.emit("\t" + cmp + " = icmp eq i32 " + node.condition->reg_name + ", 1");
+		codebuffer.emit("\tbr i1 " + cmp + ", label " + loop_entrie + ", label " + done);
+
+		codebuffer.emitLabel(loop_entrie);
+		node.body->accept(*this);
+		codebuffer.emit("\tbr label " + cond_entrie);
+
+		codebuffer.emitLabel(done);
     }
 
     void IrVisitor::visit(ast::VarDecl &node) {
@@ -350,7 +389,6 @@ namespace Ir{
 
     void IrVisitor::visit(ast::Formals &node) {
 		// TODO: complete
-		int i = -1;
 		for (auto it = node.formals.begin(); it != node.formals.end(); ++it)
 			(*it)->accept(*this);
     }
