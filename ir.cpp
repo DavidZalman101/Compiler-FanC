@@ -79,8 +79,7 @@ namespace Ir{
 		// if the offset if negative->its a function arg
 		// o.w. its a local argument
 
-		int var_offset = m_var_offset[node.value];
-		//std::cout<<"id = "<<node.value<<" offset = "<<var_offset<<std::endl;
+		int var_offset = node.offset;
 		if (var_offset >= 0) {
 			/* local argument */
 			// always reload the value from the stack to a new reg
@@ -199,6 +198,8 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::If &node) {
+
+		node.then->accept(*this);
     }
 
     void IrVisitor::visit(ast::While &node) {
@@ -233,10 +234,8 @@ namespace Ir{
     void IrVisitor::visit(ast::Formals &node) {
 		// TODO: complete
 		int i = -1;
-		for (auto it = node.formals.begin(); it != node.formals.end(); ++it) {
+		for (auto it = node.formals.begin(); it != node.formals.end(); ++it)
 			(*it)->accept(*this);
-			m_var_offset[(*it)->id->value] = (i--);
-		}
     }
 
     void IrVisitor::visit(ast::FuncDecl &node) {
@@ -245,7 +244,6 @@ namespace Ir{
 			for the local arguments as if they are i32.
 		*/
 
-		m_var_offset = node.symbol_table; /* reset */
 		// insert function declaration
 		std::string s = FuncDecl_Str(node);
 		codebuffer.emit(s + " {");

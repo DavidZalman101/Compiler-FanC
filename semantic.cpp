@@ -95,7 +95,6 @@ namespace semantic{
 			max_curr_offset = std::max(max_curr_offset, id.offset);
 			printer.emitVar(id.value, type, symbols_stack.top().offset);
 			global_symbol_table[id.value] = offset;
-			//std::cout<<"id = "<<id.value<<" address = "<<(&id)<<" offset = "<<id.offset<<std::endl;
 	}
 
 	void SemanticVisitor::changeSymbolType(const ast::ID &id, const ast::BuiltInType &type, ast::Node &node) {
@@ -146,6 +145,8 @@ namespace semantic{
 		}
 		else
 			output::errorUndef(node.line, node.value);
+
+		node.offset = global_symbol_table[node.value];
     }
 
     void SemanticVisitor::visit(ast::BinOp &node) {
