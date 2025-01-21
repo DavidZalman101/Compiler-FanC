@@ -28,7 +28,7 @@ define void @print(i8*) {
 }
 
 ;functions
-define i32 @main() {
+define void @main() {
 	; init_local_vars:
 	%stack_base_size = add i32 3, 0
 	%ptr_stack_base = alloca i32, i32 %stack_base_size
@@ -44,7 +44,7 @@ define i32 @main() {
 	store i32 %t1, i32* %t0_stack_ptr
 
 	%t2 = load i32, i32* %t1_stack_ptr
-	%t3 = add i32 0, 0
+	%t3 = add i32 0, 1
 	store i32 %t3, i32* %t1_stack_ptr
 
 	%t4 = load i32, i32* %t2_stack_ptr
@@ -87,7 +87,7 @@ label_2:
 	%t5 = load i32, i32* %t6
 	store i32 %t5, i32* %t2_stack_ptr
 
-	ret i32 %t5
+	ret void
 
 }
 

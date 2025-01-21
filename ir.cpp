@@ -5,7 +5,7 @@ namespace Ir{
 
     /* IrVisitor implementation */
 
-	std::vector<std::string> ir_BuiltInType  = {"i32", "i1", "i8", "i32", "i32", "i32"};
+	std::vector<std::string> ir_BuiltInType  = {"void", "i1", "i8", "i32", "i32", "i32"};
 
 	std::string FuncDecl_Str(const ast::FuncDecl &node) {
 
