@@ -31,6 +31,8 @@ namespace Ir{
 
 	IrVisitor::IrVisitor() {
 
+		error_div_by_zero = codebuffer.emitString("Error division by zero");
+
 		// read the print functions
 		codebuffer<<"; print functions"<<std::endl;
 		std::ifstream inputFile("print_functions.llvm");
@@ -102,6 +104,10 @@ namespace Ir{
 		std::string right_exp_reg = node.right->reg_name;
 		node.reg_name = codebuffer.freshVar();
 
+		std::string is_zero = codebuffer.freshVar() + "_is_zero";
+		std::string zero_block = codebuffer.freshLabel() + "_zero_block";
+		std::string non_zero_block = codebuffer.freshLabel() + "_non_zero_block";
+
 		switch(node.op) {
 			case(ast::BinOpType::ADD):
 				codebuffer.emit("\t" + node.reg_name + " = add i32 " + left_exp_reg + ", " + right_exp_reg);	
@@ -119,14 +125,34 @@ namespace Ir{
 				break;
 
 			case(ast::BinOpType::DIV):
+				// check if dividing by zero
+				codebuffer.emit("\t" + is_zero + " = icmp eq i32 " + right_exp_reg + ", 0");
+				codebuffer.emit("\tbr i1 " + is_zero + ", label " + zero_block + ", label " + non_zero_block);
+
+				codebuffer.emit("");
+
+				/* zero block*/
+				codebuffer.emitLabel(zero_block);
+				// print error msg and exit
+				codebuffer.emit("\t; check if dividing by zero");
+				//codebuffer.emit("\tcall void @print(i8* " + error_div_by_zero + ")");
+				codebuffer << "\tcall i32 (i8*, ...) @printf(i8* getelementptr inbounds ([23 x i8], [23 x i8]* "
+				<< error_div_by_zero << ", i32 0, i32 0))" << std::endl;
+				codebuffer.emit("\tcall void @exit(i32 0)");	
+				codebuffer.emit("\tunreachable");
+				codebuffer.emit("");
+
+				
+				/* non zero block */
+				codebuffer.emitLabel(non_zero_block);
+
+
+				/* divide */
+				codebuffer.emit("\t; divide");
 				if (node.exp_type == ast::INT)
 					codebuffer.emit("\t" + node.reg_name + " = sdiv i32 " + left_exp_reg + ", " + right_exp_reg);
 				else
 					codebuffer.emit("\t" + node.reg_name + " = udiv i32 " + left_exp_reg + ", " + right_exp_reg);
-
-				goto check_byte_overflow;
-				break;
-
 			default:
 
 			check_byte_overflow:
@@ -141,6 +167,40 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::RelOp &node) {
+		// TODO: complete
+
+		//node.left->accept(*this);
+		//node.right->accept(*this);
+
+		//switch() {
+
+		//	// ==
+		//	case(EQ):
+		//	break;
+
+		//	// !=
+		//	case(NE):
+		//	break;
+
+		//	// <
+		//	case(LT):
+		//	break;
+
+		//	// >
+		//	case(GT):
+		//	break;
+
+		//	// <=
+		//	case(LE):
+		//	break;
+
+		//	// >=
+		//	case(GE):
+		//	break;
+
+		//	default:
+		//	break;
+		//}
     }
 
     void IrVisitor::visit(ast::Type &node) {

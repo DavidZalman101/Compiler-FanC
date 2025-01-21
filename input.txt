@@ -1,32 +1,7 @@
 void main() {
 	int x;
-
-	if (true) {
-		int w;
-		int z;
-	}
-
 	int z;
 	int w;
 
-	int res = z + w;
-}
-
-int foo(int arg0, int arg1)
-{
-	int a = 0;
-	int b = 1;
-
-	if (false) {
-		int c = 2;
-		int d = 3;
-
-		int e = c + d + a;
-	}
-
-	int e = a + b;
-
-
-
-
+	int res = z / w;
 }

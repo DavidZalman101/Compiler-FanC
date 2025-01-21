@@ -1,4 +1,4 @@
-
+@.str0 = constant [23 x i8] c"Error division by zero\00"
 ; print functions
 declare i32 @scanf(i8*, ...)
 declare i32 @printf(i8*, ...)
@@ -49,66 +49,22 @@ define i32 @main() {
 	%t2 = load i32, i32* %t2_stack_ptr
 	store i32 0, i32* %t2_stack_ptr
 
+	%t3 = load i32, i32* %t3_stack_ptr
+	%t4 = load i32, i32* %t1_stack_ptr
+	%t5 = load i32, i32* %t2_stack_ptr
+	%t7_is_zero = icmp eq i32 %t5, 0
+	br i1 %t7_is_zero, label %label_0_zero_block, label %label_1_non_zero_block
 
-	%t3 = load i32, i32* %t1_stack_ptr
-	store i32 0, i32* %t1_stack_ptr
+label_0_zero_block:
+	; check if dividing by zero
+	call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([23 x i8], [23 x i8]* @.str0, i32 0, i32 0))
+	call void @exit(i32 1)
+	unreachable
 
-	%t4 = load i32, i32* %t2_stack_ptr
-	store i32 0, i32* %t2_stack_ptr
-
-	%t5 = load i32, i32* %t3_stack_ptr
-	%t6 = load i32, i32* %t1_stack_ptr
-	%t7 = load i32, i32* %t2_stack_ptr
-	%t8 = add i32 %t6, %t7
-	store i32 %t8, i32* %t3_stack_ptr
-
-
-	ret i32 0
-}
-
-define i32 @foo(i32, i32) {
-	; init_local_vars:
-	%stack_base_size = add i32 5, 0
-	%ptr_stack_base = alloca i32, i32 %stack_base_size
-	store i32 0, i32* %ptr_stack_base
-
-	; init pointers to local arguments
-	%t0_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 0
-	%t1_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 1
-	%t2_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 2
-	%t3_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 3
-	%t4_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 4
-
-	%t9 = load i32, i32* %t0_stack_ptr
-	%t10 = add i32 0, 0
-	store i32 %t10, i32* %t0_stack_ptr
-
-	%t11 = load i32, i32* %t1_stack_ptr
-	%t12 = add i32 0, 1
-	store i32 %t12, i32* %t1_stack_ptr
-
-	%t13 = load i32, i32* %t2_stack_ptr
-	%t14 = add i32 0, 2
-	store i32 %t14, i32* %t2_stack_ptr
-
-	%t15 = load i32, i32* %t3_stack_ptr
-	%t16 = add i32 0, 3
-	store i32 %t16, i32* %t3_stack_ptr
-
-	%t17 = load i32, i32* %t4_stack_ptr
-	%t18 = load i32, i32* %t2_stack_ptr
-	%t19 = load i32, i32* %t3_stack_ptr
-	%t20 = add i32 %t18, %t19
-	%t21 = load i32, i32* %t0_stack_ptr
-	%t22 = add i32 %t20, %t21
-	store i32 %t22, i32* %t4_stack_ptr
-
-
-	%t23 = load i32, i32* %t2_stack_ptr
-	%t24 = load i32, i32* %t0_stack_ptr
-	%t25 = load i32, i32* %t1_stack_ptr
-	%t26 = add i32 %t24, %t25
-	store i32 %t26, i32* %t2_stack_ptr
+label_1_non_zero_block:
+	; divide
+	%t6 = sdiv i32 %t4, %t5
+	store i32 %t6, i32* %t3_stack_ptr
 
 
 	ret i32 0

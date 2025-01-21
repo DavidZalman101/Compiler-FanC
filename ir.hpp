@@ -25,6 +25,7 @@ namespace Ir{
 	
     public:
 		
+		std::string error_div_by_zero;
     	output::CodeBuffer codebuffer;
 
 		IrVisitor();
