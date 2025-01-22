@@ -1,17 +1,7 @@
 void main() {
 
-	int x = 3;
-	while (x >= 0) {
-		x = x - 1;
-		continue;
-		x = x - 1;
-	}
-
-	printi(foo(x, x));
+	print("hello world");
+	print("you are a poopy head");
 
 	return;
-}
-
-int foo(int arg0, int arg1) {
-	return arg0 * arg1;
 }

@@ -65,6 +65,7 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::String &node) {
+		node.constant_str = codebuffer.emitString(node.value);
     }
 
     void IrVisitor::visit(ast::Bool &node) {
@@ -295,6 +296,16 @@ namespace Ir{
     void IrVisitor::visit(ast::Call &node) {
 
 		node.args->accept(*this);
+
+		// take care of print - needs special treatment
+		if (node.func_id->value == "print") {
+			int len = node.args->exps[0]->str_val.size() + 1;
+			std::string type_str = "[" + std::to_string(len) + " x i8], [" + std::to_string(len) + " x i8]* ";
+        	codebuffer << "\tcall i32 (i8*, ...) @printf(i8* getelementptr inbounds (" + type_str
+			<< node.args->exps[0]->constant_str << ", i32 0, i32 0))" << std::endl;
+			return;
+		}
+
 		node.reg_name = codebuffer.freshVar();
 		std::string call_str = "\t";
 		if (func_retType[node.func_id->value] == "i32")

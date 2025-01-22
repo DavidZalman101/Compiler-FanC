@@ -59,6 +59,8 @@ namespace ast {
 		std::string reg_name; // helps knowing what reg holds its value
 		std::string true_label;
 		std::string false_label;
+		std::string constant_str; // for ir
+		std::string str_val; // for ir
         Exp() = default;
 		Exp(BuiltInType exp_type);
     };

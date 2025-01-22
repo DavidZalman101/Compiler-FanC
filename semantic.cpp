@@ -126,6 +126,7 @@ namespace semantic{
 
     void SemanticVisitor::visit(ast::String &node) {
 
+		node.str_val = node.value;
 		node.exp_type = ast::STRING;
     }
 
