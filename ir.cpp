@@ -33,21 +33,49 @@ namespace Ir{
 
 		error_div_by_zero = codebuffer.emitString("Error division by zero");
 
+		std::string print_functions =
+										"declare i32 @scanf(i8*, ...)\n"
+										"declare i32 @printf(i8*, ...)\n"
+										"declare void @exit(i32)\n"
+										"@.int_specifier_scan = constant [3 x i8] c\"%d\\00\"\n"
+										"@.int_specifier = constant [4 x i8] c\"%d\\0A\\00\"\n"
+										"@.str_specifier = constant [4 x i8] c\"%s\\0A\\00\"\n"
+										"\n"
+										"define i32 @readi(i32) {\n"
+										"    %ret_val = alloca i32\n"
+										"    %spec_ptr = getelementptr [3 x i8], [3 x i8]* @.int_specifier_scan, i32 0, i32 0\n"
+										"    call i32 (i8*, ...) @scanf(i8* %spec_ptr, i32* %ret_val)\n"
+										"    %val = load i32, i32* %ret_val\n"
+										"    ret i32 %val\n"
+										"}\n"
+										"\n"
+										"define void @printi(i32) {\n"
+										"    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0\n"
+										"    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)\n"
+										"    ret void\n"
+										"}\n"
+										"\n"
+										"define void @print(i8*) {\n"
+										"    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0\n"
+										"    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)\n"
+										"    ret void\n"
+										"}\n";
+
 		// read the print functions
-		codebuffer<<"; print functions"<<std::endl;
-		std::ifstream inputFile("print_functions.llvm");
-		if (!inputFile.is_open()) {
-			std::cerr<<"Error: Could not open the file."<<std::endl;
-			exit(0);
-		}
+		//codebuffer<<"; print functions"<<std::endl;
+		//std::ifstream inputFile("print_functions.llvm");
+		//if (!inputFile.is_open()) {
+		//	std::cerr<<"Error: Could not open the file."<<std::endl;
+		//	exit(0);
+		//}
 
-    	std::string line;
-    	while (std::getline(inputFile, line))
-        	codebuffer<<line<<std::endl;
+    	//std::string line;
+    	//while (std::getline(inputFile, line))
+        //	codebuffer<<line<<std::endl;
 
-		inputFile.close();
+		//inputFile.close();
 
-		codebuffer<<std::endl;
+		codebuffer<<print_functions<<std::endl;
 	}
 
     void IrVisitor::visit(ast::Num &node) {
