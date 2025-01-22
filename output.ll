@@ -1,4 +1,7 @@
-@.str0 = constant [23 x i8] c"Error division by zero\00"@.str1 = constant [12 x i8] c"hello world\00"@.str2 = constant [21 x i8] c"you are a poopy head\00"
+@.str0 = constant [23 x i8] c"Error division by zero\00"
+@.str1 = constant [12 x i8] c"hello world\00"
+@.str2 = constant [21 x i8] c"you are a poopy head\00"
+
 ; print functions
 declare i32 @scanf(i8*, ...)
 declare i32 @printf(i8*, ...)

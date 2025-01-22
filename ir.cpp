@@ -5,7 +5,7 @@ namespace Ir{
 
     /* IrVisitor implementation */
 
-	std::vector<std::string> ir_BuiltInType  = {"void", "i1", "i8", "i32", "i32", "i32"};
+	std::vector<std::string> ir_BuiltInType  = {"void", "i32", "i32", "i32", "i32", "i32"};
 
 	std::string FuncDecl_Str(const ast::FuncDecl &node) {
 
@@ -65,6 +65,7 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::String &node) {
+		//std::cout<<node.value<<" "<<node.value.size()<<std::endl;
 		node.constant_str = codebuffer.emitString(node.value);
     }
 
@@ -343,6 +344,8 @@ namespace Ir{
 
     void IrVisitor::visit(ast::Return &node) {
 
+		had_ret = true;
+	
 		if (!node.exp)
 			codebuffer.emit("\tret void");
 		else {
@@ -440,6 +443,7 @@ namespace Ir{
 			for the local arguments as if they are i32.
 		*/
 		int i = 0;
+		had_ret = false;
 		func_arg_num = std::unordered_map<std::string, std::string>();
 		for (auto it = node.formals->formals.begin(); it != node.formals->formals.end(); ++it)
 			func_arg_num[(*it)->id->value] = "%" + std::to_string(i++);
@@ -470,6 +474,16 @@ namespace Ir{
 
 		// TODO: visit the body
 		node.body->accept(*this);
+
+		if (!had_ret) {
+			// defualt ret value
+			if (node.return_type->type != ast::VOID)
+				codebuffer.emit("\tret i32 0");
+			else
+				codebuffer.emit("\tret void");
+		}
+	
+
 		codebuffer.emit("}\n");
 		//}
     }
