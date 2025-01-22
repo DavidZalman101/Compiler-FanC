@@ -66,7 +66,8 @@ namespace Ir{
 
     void IrVisitor::visit(ast::String &node) {
 		//std::cout<<node.value<<" "<<node.value.size()<<std::endl;
-		node.constant_str = codebuffer.emitString(node.value);
+		//node.constant_str = codebuffer.emitString(node.value);
+		node.reg_name = codebuffer.emitString(node.value);
     }
 
     void IrVisitor::visit(ast::Bool &node) {
@@ -301,9 +302,15 @@ namespace Ir{
 		// take care of print - needs special treatment
 		if (node.func_id->value == "print") {
 			int len = node.args->exps[0]->str_val.size() + 1;
-			std::string type_str = "[" + std::to_string(len) + " x i8], [" + std::to_string(len) + " x i8]* ";
-        	codebuffer << "\tcall i32 (i8*, ...) @printf(i8* getelementptr inbounds (" + type_str
-			<< node.args->exps[0]->constant_str << ", i32 0, i32 0))" << std::endl;
+			//std::string type_str = "[" + std::to_string(len) + " x i8], [" + std::to_string(len) + " x i8]* ";
+        	//codebuffer << "\tcall i32 (i8*, ...) @printf(i8* getelementptr inbounds (" + type_str
+			//<< node.args->exps[0]->constant_str << ", i32 0, i32 0))" << std::endl;
+			//codebuffer << "call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([14 x i8], [14 x i8]* "
+			//<< node.args->exps[0]->reg_name << ", i32 0, i32 0))" << std::endl;
+			std::string ptr_str = codebuffer.freshVar();
+			codebuffer.emit("\t" + ptr_str + " = getelementptr [" + std::to_string(len) + " x i8], [" + 
+			std::to_string(len) + " x i8]* " + node.args->exps[0]->reg_name + ", i32 0, i32 0");
+			codebuffer.emit("\tcall void @print(i8* " + ptr_str + ")");
 			return;
 		}
 

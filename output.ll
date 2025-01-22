@@ -40,9 +40,11 @@ define void @main() {
 	; init pointers to local arguments
 	%t0_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 0
 
-	call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([12 x i8], [12 x i8]* @.str1, i32 0, i32 0))
+	%t0 = getelementptr [12 x i8], [12 x i8]* @.str1, i32 0, i32 0
+	call void @print(i8* %t0)
 
-	call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([21 x i8], [21 x i8]* @.str2, i32 0, i32 0))
+	%t1 = getelementptr [21 x i8], [21 x i8]* @.str2, i32 0, i32 0
+	call void @print(i8* %t1)
 
 	ret void
 
