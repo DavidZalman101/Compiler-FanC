@@ -1,6 +1,4 @@
 @.str0 = constant [23 x i8] c"Error division by zero\00"
-@.str1 = constant [12 x i8] c"hello world\00"
-@.str2 = constant [21 x i8] c"you are a poopy head\00"
 
 ; print functions
 declare i32 @scanf(i8*, ...)
@@ -33,20 +31,43 @@ define void @print(i8*) {
 ;functions
 define void @main() {
 	; init_local_vars:
-	%stack_base_size = add i32 1, 0
+	%stack_base_size = add i32 3, 0
 	%ptr_stack_base = alloca i32, i32 %stack_base_size
 	store i32 0, i32* %ptr_stack_base
 
 	; init pointers to local arguments
 	%t0_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 0
+	%t1_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 1
+	%t2_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 2
 
-	%t0 = getelementptr [12 x i8], [12 x i8]* @.str1, i32 0, i32 0
-	call void @print(i8* %t0)
+	%t0 = load i32, i32* %t0_stack_ptr
+	%t1 = add i32 0, 5
+	store i32 %t1, i32* %t0_stack_ptr
 
-	%t1 = getelementptr [21 x i8], [21 x i8]* @.str2, i32 0, i32 0
-	call void @print(i8* %t1)
+	%t2 = load i32, i32* %t1_stack_ptr
+	%t3 = add i32 0, 5
+	store i32 %t3, i32* %t1_stack_ptr
+
+	%t4 = load i32, i32* %t2_stack_ptr
+	%t5 = add i32 0, 2
+	%t6 = load i32, i32* %t0_stack_ptr
+	%t7 = load i32, i32* %t1_stack_ptr
+	%t8 = sub i32 %t6, %t7
+	%t12_is_zero = icmp eq i32 %t8, 0
+	br i1 %t12_is_zero, label %label_2_zero_block, label %label_3_non_zero_block
+
+label_2_zero_block:
+	; check if dividing by zero
+	%t13 = getelementptr [23 x i8], [23 x i8]* @.str0, i32 0, i32 0
+	call void @print(i8* %t13)
+	call void @exit(i32 0)
+	unreachable
+
+label_3_non_zero_block:
+	; divide
+	%t11 = sdiv i32 %t5, %t8
+	store i32 %t11, i32* %t2_stack_ptr
 
 	ret void
-
 }
 

@@ -112,6 +112,7 @@ namespace Ir{
 		std::string is_zero = codebuffer.freshVar() + "_is_zero";
 		std::string zero_block = codebuffer.freshLabel() + "_zero_block";
 		std::string non_zero_block = codebuffer.freshLabel() + "_non_zero_block";
+		std::string err_zero_div_ptr = codebuffer.freshVar();
 
 		switch(node.op) {
 			case(ast::BinOpType::ADD):
@@ -141,8 +142,14 @@ namespace Ir{
 				// print error msg and exit
 				codebuffer.emit("\t; check if dividing by zero");
 				//codebuffer.emit("\tcall void @print(i8* " + error_div_by_zero + ")");
-				codebuffer << "\tcall i32 (i8*, ...) @printf(i8* getelementptr inbounds ([23 x i8], [23 x i8]* "
-				<< error_div_by_zero << ", i32 0, i32 0))" << std::endl;
+
+				codebuffer.emit("\t" + err_zero_div_ptr + " = getelementptr [23 x i8], [23 x i8]* " + error_div_by_zero +
+				", i32 0, i32 0");
+				codebuffer.emit("\tcall void @print(i8* " + err_zero_div_ptr + ")");
+
+				//codebuffer << "\tcall i32 (i8*, ...) @printf(i8* getelementptr inbounds ([23 x i8], [23 x i8]* "
+				//<< error_div_by_zero << ", i32 0, i32 0))" << std::endl;
+
 				codebuffer.emit("\tcall void @exit(i32 0)");	
 				codebuffer.emit("\tunreachable");
 				codebuffer.emit("");
