@@ -7,5 +7,11 @@ void main() {
 		x = x - 1;
 	}
 
+	printi(foo(x, x));
+
 	return;
+}
+
+int foo(int arg0, int arg1) {
+	return arg0 * arg1;
 }

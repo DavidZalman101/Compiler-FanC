@@ -51,7 +51,6 @@ label_0:
 	br i1 %t2, label %label_1, label %label_2
 label_1:
 	%t7 = load i32, i32* %t0_stack_ptr
-	call void @printi(i32 %t7)
 	%t8 = add i32 0, 1
 	%t9 = sub i32 %t7, %t8
 	store i32 %t9, i32* %t0_stack_ptr
@@ -66,7 +65,26 @@ label_1:
 	br label %label_0
 label_2:
 
+	%t15 = load i32, i32* %t0_stack_ptr
+	%t16 = load i32, i32* %t0_stack_ptr
+	%t17 = call i32 @foo(i32 %t16, i32 %t15)
+	 call void @printi(i32 %t17)
+
 	ret void
+
+}
+
+define i32 @foo(i32, i32) {
+	; init_local_vars:
+	%stack_base_size = add i32 1, 0
+	%ptr_stack_base = alloca i32, i32 %stack_base_size
+	store i32 0, i32* %ptr_stack_base
+
+	; init pointers to local arguments
+	%t0_stack_ptr = getelementptr i32,i32* %ptr_stack_base, i32 0
+
+	%t19 = mul i32 %0, %1
+	ret i32 %t19
 
 }
 

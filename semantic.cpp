@@ -137,9 +137,9 @@ namespace semantic{
     void SemanticVisitor::visit(ast::ID &node) {
 
 		// if the ID is a function
-		if (symbolExists(node))
+		if (symbolExists(node)) {
 			node.exp_type = symbols_map[node.value];
-		else if (funcs_map.find(node.value) != funcs_map.end()) {
+		} else if (funcs_map.find(node.value) != funcs_map.end()) {
 			node.exp_type = ast::FUNC;
 			node.exp_name = node.value;
 		}
@@ -147,6 +147,7 @@ namespace semantic{
 			output::errorUndef(node.line, node.value);
 
 		node.offset = global_symbol_table[node.value];
+		//std::cout<<node.value<<" : "<<node.offset<<std::endl;
     }
 
     void SemanticVisitor::visit(ast::BinOp &node) {

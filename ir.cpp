@@ -81,18 +81,20 @@ namespace Ir{
 		// if the offset if negative->its a function arg
 		// o.w. its a local argument
 
-		int var_offset = node.offset;
-		if (var_offset >= 0) {
-			/* local argument */
+		if (func_arg_num.count(node.value) != 0) {
+			// function argument
+			// function argument dont get writtern into them
+			// therfore there is no need to manage him, feel free to read his
+			// dedicate reg :)
+			node.reg_name = func_arg_num[node.value];
+		} else {
+			int var_offset = node.offset;
+			// local argument
 			// always reload the value from the stack to a new reg
 			node.reg_name = codebuffer.freshVar();
 			std::string ptr = "%t" + std::to_string(var_offset) + "_stack_ptr";
 			codebuffer.emit("\t" + node.reg_name + " = load i32, i32* " + ptr);
 
-		} else {
-			/* function arguemnt */
-			int argument_number = abs(var_offset) - 1;
-			node.reg_name = "%" + std::to_string(argument_number);
 		}
     }
 
@@ -286,9 +288,31 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::ExpList &node) {
+		for (auto it = node.exps.rbegin(); it != node.exps.rend(); ++it)
+			(*it)->accept(*this);
     }
 
     void IrVisitor::visit(ast::Call &node) {
+
+		node.args->accept(*this);
+		node.reg_name = codebuffer.freshVar();
+		std::string call_str = "\t";
+		if (func_retType[node.func_id->value] == "i32")
+			call_str += node.reg_name + " = call " + func_retType[node.func_id->value];
+		else
+			call_str += " call " + func_retType[node.func_id->value];
+
+		call_str += " @" + node.func_id->value + "(";
+
+		if (node.args->exps.size() > 0)
+			call_str += "i32 " + node.args->exps[0]->reg_name;
+
+		for (int i = 1; i < node.args->exps.size(); i++)
+			call_str += ", i32 " + node.args->exps[i]->reg_name;
+
+		call_str += ")";
+
+		codebuffer.emit(call_str);
     }
 
     void IrVisitor::visit(ast::Statements &node) {
@@ -395,7 +419,6 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::Formals &node) {
-		// TODO: complete
 		for (auto it = node.formals.begin(); it != node.formals.end(); ++it)
 			(*it)->accept(*this);
     }
@@ -405,6 +428,10 @@ namespace Ir{
 			At the begining of a function we allocate space
 			for the local arguments as if they are i32.
 		*/
+		int i = 0;
+		func_arg_num = std::unordered_map<std::string, std::string>();
+		for (auto it = node.formals->formals.begin(); it != node.formals->formals.end(); ++it)
+			func_arg_num[(*it)->id->value] = "%" + std::to_string(i++);
 
 		// insert function declaration
 		std::string s = FuncDecl_Str(node);
@@ -439,7 +466,14 @@ namespace Ir{
     void IrVisitor::visit(ast::Funcs &node) {
 		// print functions were inserted at construction time
 
+		for (auto it = node.funcs.begin(); it != node.funcs.end(); ++it)
+			func_retType[(*it)->id->value] = (*it)->return_type->type == ast::VOID ? "void" : "i32";
+
+		func_retType["readi"] = "i32";
+		func_retType["print"] = func_retType["printi"] = "void";
+			
 		// travel each declared function
+
 		codebuffer.emit(";functions");
 		for (auto it = node.funcs.begin(); it != node.funcs.end(); ++it) {
 			(*it)->accept(*this);

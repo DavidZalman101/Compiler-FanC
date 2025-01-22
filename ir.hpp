@@ -29,6 +29,8 @@ namespace Ir{
     	output::CodeBuffer codebuffer;
 		std::stack<std::string> while_exit_labels;
 		std::stack<std::string> while_cond_labels;
+		std::unordered_map<std::string, std::string> func_retType;
+		std::unordered_map<std::string, std::string> func_arg_num;
 
 		IrVisitor();
 
