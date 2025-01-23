@@ -326,7 +326,7 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::ExpList &node) {
-		for (auto it = node.exps.rbegin(); it != node.exps.rend(); ++it)
+		for (auto it = node.exps.begin(); it != node.exps.end(); ++it)
 			(*it)->accept(*this);
     }
 
