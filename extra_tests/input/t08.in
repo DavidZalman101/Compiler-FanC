@@ -1,0 +1,7 @@
+int bar() {
+	print("bar");
+}
+
+void main() {
+	bar();
+}
