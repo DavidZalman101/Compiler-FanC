@@ -262,6 +262,10 @@ namespace Ir{
     }
 
     void IrVisitor::visit(ast::Cast &node) {
+        node.exp->accept(*this);
+        node.target_type->accept(*this);
+        node.reg_name = codebuffer.freshVar();
+        codebuffer.emit("\t" + node.reg_name + " = add i32 0, " + node.exp->reg_name);
     }
 
     void IrVisitor::visit(ast::Not &node) {
