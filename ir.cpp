@@ -266,6 +266,12 @@ namespace Ir{
         node.target_type->accept(*this);
         node.reg_name = codebuffer.freshVar();
         codebuffer.emit("\t" + node.reg_name + " = add i32 0, " + node.exp->reg_name);
+		// if we cast to a byte, make sure to zero the upper 24 bits
+		if (node.target_type->type == ast::BYTE) {
+			std::string truced_reg = codebuffer.freshVar();
+			codebuffer.emit("\t" + truced_reg + " = and i32 " + node.reg_name + ", 255");
+			node.reg_name = truced_reg;
+		}
     }
 
     void IrVisitor::visit(ast::Not &node) {
@@ -521,13 +527,13 @@ namespace Ir{
 		// TODO: visit the body
 		node.body->accept(*this);
 
-		if (!had_ret) {
+		//if (!had_ret) {
 			// defualt ret value
 			if (node.return_type->type != ast::VOID)
 				codebuffer.emit("\tret i32 0");
 			else
 				codebuffer.emit("\tret void");
-		}
+		//}
 	
 
 		codebuffer.emit("}\n");
