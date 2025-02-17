@@ -1,5 +1,5 @@
 # FanC Compiler
-### The compilers frontend stackges
+### The compilers frontend stages
 - Lexical Analysis - Flex
 - Syntax Analysis - Bison
 - Semantic Analysis - Visitor Design
