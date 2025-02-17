@@ -1,7 +1,0 @@
-int foo() {
-	print("foo");
-}
-
-void main() {
-	foo();
-}

@@ -1,7 +1,0 @@
-int baz() {
-	print("baz");
-}
-
-void main() {
-	baz();
-}
